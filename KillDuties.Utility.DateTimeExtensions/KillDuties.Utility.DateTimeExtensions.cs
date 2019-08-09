@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 
 namespace KillDuties.Utility
 {
@@ -15,6 +17,27 @@ namespace KillDuties.Utility
 
         public static bool IsLaterThan(this DateTime input, DateTime value)
             => input.CompareTo(value) > 0;
+
+        public static bool IsLeapYear(this DateTime input)
+            => DateTime.IsLeapYear(input.Year);
+
+        /// <summary>
+        /// Compare two DateTime have the same value of date part.
+        /// </summary>
+        /// <param name="input">DateTime input</param>
+        /// <param name="value">DateTime to be compared with</param>
+        /// <returns></returns>
+        public static bool IsSameDate(this DateTime input, DateTime value)
+            => input.Date == value.Date;
+
+        /// <summary>
+        /// Compare two DateTime have the same value of time part.
+        /// </summary>
+        /// <param name="input">DateTime input</param>
+        /// <param name="value">DateTime to be compared with</param>
+        /// <returns></returns>
+        public static bool IsSameTime(this DateTime input, DateTime value)
+            => input - input.Date == value - value.Date;
 
         public static bool IsStartOfMonth(this DateTime input)
             => input.Day == 1;
@@ -87,12 +110,101 @@ namespace KillDuties.Utility
             return 0;
         }
 
-        public static double CurrentUnixTime => DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-
         public static double GetTimeZone => (DateTime.Now - DateTimeOffset.UtcNow).TotalHours;
 
         public static double ToUnixTime(this DateTime input)
             => input.CompareTo(new DateTime(1970, 1, 1), DateTimeDifferenceFormat.Seconds);
+
+        public static int NextLeapYear(this DateTime input)
+        {
+            int i = 0;
+            do
+            {
+                i++;
+                if (input.AddYears(i).IsLeapYear())
+                    return input.Year;
+            } while (i > 8);
+            return 0;
+        }
+
+        public static long CurrentUnixTime => DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+        /// <summary>
+        /// Return list of year, month and day after changing the calendar.
+        /// </summary>
+        /// <param name="input">DateTime input</param>
+        /// <param name="format">Calendar format</param>
+        /// <returns></returns>
+        public static List<int> GetCalendarChangedList(this DateTime input, CalendarFormat format)
+        {
+            List<int> result = new List<int>();
+            Calendar calendar = new GregorianCalendar();
+
+            switch (format)
+            {
+                case CalendarFormat.ChineseLunisolar:
+                    calendar = new ChineseLunisolarCalendar();
+                    break;
+                case CalendarFormat.Gregorian:
+                    break;
+                case CalendarFormat.Hebrew:
+                    calendar = new HebrewCalendar();
+                    break;
+                case CalendarFormat.Hijri:
+                    calendar = new HijriCalendar();
+                    break;
+                case CalendarFormat.Japanese:
+                    calendar = new JapaneseCalendar();
+                    break;
+                case CalendarFormat.JapaneseLunisolar:
+                    calendar = new JapaneseLunisolarCalendar();
+                    break;
+                case CalendarFormat.Julian:
+                    calendar = new JulianCalendar();
+                    break;
+                case CalendarFormat.Korean:
+                    calendar = new KoreanCalendar();
+                    break;
+                case CalendarFormat.KoreanLunisolar:
+                    calendar = new KoreanLunisolarCalendar();
+                    break;
+                case CalendarFormat.Persian:
+                    calendar = new PersianCalendar();
+                    break;
+                case CalendarFormat.Taiwan:
+                    calendar = new TaiwanCalendar();
+                    break;
+                case CalendarFormat.TaiwanLunisolar:
+                    calendar = new TaiwanLunisolarCalendar();
+                    break;
+                case CalendarFormat.ThaiBuddhist:
+                    calendar = new ThaiBuddhistCalendar();
+                    break;
+                case CalendarFormat.UmAlQura:
+                    calendar = new UmAlQuraCalendar();
+                    break;
+            }
+            result.AddRange(new int[] { calendar.GetYear(input), calendar.GetMonth(input), calendar.GetDayOfMonth(input) });
+            return result;
+        }
+    }
+
+    public enum CalendarFormat
+    {
+        ChineseLunisolar,
+        Gregorian,
+        Hebrew,
+        Hijri,
+        Japanese,
+        JapaneseLunisolar,
+        Julian,
+        Korean,
+        KoreanLunisolar,
+        Persian,
+        Taiwan,
+        TaiwanLunisolar,
+        ThaiBuddhist,
+        UmAlQura
     }
 
     public enum DateTimeDifferenceFormat

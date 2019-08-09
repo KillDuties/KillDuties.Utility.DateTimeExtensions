@@ -41,6 +41,9 @@ namespace KillDuties.Utility
 		public static bool IsEndOfMonth(this DateTime input);
 		public static bool IsEndOfWeek(this DateTime input, DayOfWeek weekEnd = DayOfWeek.Saturday);
 		public static bool IsLaterThan(this DateTime input, DateTime value);
+		public static bool IsLeapYear(this DateTime input);
+		public static bool IsSameDate(this DateTime input, DateTime value);
+        public static bool IsSameTime(this DateTime input, DateTime value);
 		public static bool IsStartOfMonth(this DateTime input);
 		public static bool IsStartOfWeek(this DateTime input, DayOfWeek weekStart = DayOfWeek.Sunday);
 		public static bool WillChangeMonth(this DateTime input, double value, DateTimeDifferenceFormat differenceFormat = DateTimeDifferenceFormat.Days);
@@ -48,11 +51,14 @@ namespace KillDuties.Utility
 		public static DateTime FromUnixTime(this int unixTimestamp);
 		public static DateTime FromUnixTime(this double unixTimestamp);
 		public static double CompareTo(this DateTime input, DateTime value, DateTimeDifferenceFormat differenceFormat = DateTimeDifferenceFormat.Days);
-		public static double CurrentUnixTime;
 		public static double GetTimeZone;
 		public static double ToUnixTime(this DateTime input);
+		public static int NextLeapYear(this DateTime input);
+		public static long CurrentUnixTime;
+		public static List<int> GetCalendarChangedList(this DateTime input, CalendarFormat format);
 	}
 
+	public enum CalendarFormat;
 	public enum DateTimeDifferenceFormat;
 }
 ```
