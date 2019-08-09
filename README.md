@@ -7,17 +7,16 @@ Create easy to use library for datetime operations.
 ## Framework
 
 The code is written using VS 2019 with dotnet core 2.2. 
-You can change the code line with //discard and //Out variables to allow the code support down to C# 3.0.
 
 |C# Version | Supported          |
 | --------- | ------------------ |
-| >= 7.0    | :white_check_mark: |
-| < 7.0     | :x:                |
+| >= 3.0    | :white_check_mark: |
+| < 3.0     | :x:                |
   
 |.Net Framwork Version | Supported          |
 | -------------------- | ------------------ |
-| >= 4.6               | :white_check_mark: |
-| < 4.6                | :x:                |
+| >= 3.5               | :white_check_mark: |
+| < 3.5                | :x:                |
 
 |.Net Core Version | Supported          |
 | ---------------- | ------------------ |
