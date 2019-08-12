@@ -52,8 +52,28 @@ namespace KillDuties.Utility
         /// <param name="value">Value to be adding / subtracting</param>
         /// <param name="differenceFormat">DateTime difference format</param>
         /// <returns></returns>
+        public static bool WillChangeDate(this DateTime input, double value, DateTimeDifferenceFormat differenceFormat = DateTimeDifferenceFormat.Hours)
+            => input.Date != input.Add(value, differenceFormat).Date;
+
+        /// <summary>
+        /// Check after the month is changed when adding / subtracting a value of DateTimeDifferenceFormat.
+        /// </summary>
+        /// <param name="input">DateTime input</param>
+        /// <param name="value">Value to be adding / subtracting</param>
+        /// <param name="differenceFormat">DateTime difference format</param>
+        /// <returns></returns>
         public static bool WillChangeMonth(this DateTime input, double value, DateTimeDifferenceFormat differenceFormat = DateTimeDifferenceFormat.Days)
             => input.Month != input.Add(value, differenceFormat).Month;
+
+        /// <summary>
+        /// Check after the year is changed when adding / subtracting a value of DateTimeDifferenceFormat.
+        /// </summary>
+        /// <param name="input">DateTime input</param>
+        /// <param name="value">Value to be adding / subtracting</param>
+        /// <param name="differenceFormat">DateTime difference format</param>
+        /// <returns></returns>
+        public static bool WillChangeYear(this DateTime input, double value, DateTimeDifferenceFormat differenceFormat = DateTimeDifferenceFormat.Days)
+            => input.Year != input.Add(value, differenceFormat).Year;
 
         public static DateTime Add(this DateTime input, double value, DateTimeDifferenceFormat differenceFormat = DateTimeDifferenceFormat.Days)
         {
@@ -85,6 +105,24 @@ namespace KillDuties.Utility
         public static DateTime FromUnixTime(this double unixTimestamp)
             => new DateTime(1970, 1, 1).Add(unixTimestamp, DateTimeDifferenceFormat.Seconds);
 
+        public static DateTime LastMonth(this DateTime input)
+            => input.AddMonths(-1);
+
+        public static DateTime LastWeek(this DateTime input)
+            => input.AddDays(-7);
+
+        public static DateTime LastYear(this DateTime input)
+            => input.AddYears(-1);
+
+        public static DateTime NextMonth(this DateTime input)
+            => input.AddMonths(1);
+
+        public static DateTime NextWeek(this DateTime input)
+            => input.AddDays(7);
+
+        public static DateTime NextYear(this DateTime input)
+            => input.AddYears(1);
+
         public static double CompareTo(this DateTime input, DateTime value, DateTimeDifferenceFormat differenceFormat = DateTimeDifferenceFormat.Days)
         {
             TimeSpan result = input - value;
@@ -115,19 +153,50 @@ namespace KillDuties.Utility
         public static double ToUnixTime(this DateTime input)
             => input.CompareTo(new DateTime(1970, 1, 1), DateTimeDifferenceFormat.Seconds);
 
+        public static int WeekNumber(this DateTime input, CalendarWeekRule weekRule = CalendarWeekRule.FirstDay, DayOfWeek weekStart = DayOfWeek.Monday)
+            => new GregorianCalendar().GetWeekOfYear(input, weekRule, weekStart);
+
+        public static int MaxWeekNumber(this DateTime input, CalendarWeekRule weekRule = CalendarWeekRule.FirstDay, DayOfWeek weekStart = DayOfWeek.Monday)
+            => MaxWeekNumber(input.Year, weekRule, weekStart);
+
+        public static int MaxWeekNumber(int year, CalendarWeekRule weekRule = CalendarWeekRule.FirstDay, DayOfWeek weekStart = DayOfWeek.Monday)
+            => new GregorianCalendar().GetWeekOfYear(new DateTime(year, 12, 31), weekRule, weekStart);
+
+        public static int LastLeapYear(this DateTime input)
+        {
+            input = input.AddYears(-1); //Skip input year
+            if (input.IsLeapYear())
+                return input.Year;
+            input = input.AddYears(-(input.Year % 4));
+            return input.Year + (input.IsLeapYear() ? 0 : -4); //Leap year 100 rules
+        }
+
         public static int NextLeapYear(this DateTime input)
         {
-            int i = 0;
-            do
-            {
-                i++;
-                if (input.AddYears(i).IsLeapYear())
-                    return input.Year;
-            } while (i > 8);
-            return 0;
+            input = input.AddYears(1); //Skip input year
+            if (input.IsLeapYear())
+                return input.Year;
+            input = input.AddYears(4 - (input.Year % 4));
+            return input.Year + (input.IsLeapYear() ? 0 : 4); //Leap year 100 rules
         }
 
         public static long CurrentUnixTime => DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+        public static IEnumerable<DateTime> GetDateListInCurrentWeekNumber(this DateTime input, CalendarWeekRule weekRule = CalendarWeekRule.FirstDay, DayOfWeek weekStart = DayOfWeek.Monday)
+        {
+            DateTime datePointer = input.AddDays(-8);
+
+            int datePointerWeekNo = datePointer.WeekNumber(weekRule, weekStart);
+            int weekNo = input.WeekNumber(weekRule, weekStart);
+
+            while (datePointerWeekNo <= weekNo)
+            {
+                if (datePointerWeekNo == weekNo)
+                    yield return datePointer;
+                datePointer.AddDays(1);
+                datePointerWeekNo = datePointer.WeekNumber(weekRule, weekStart);
+            }
+        }
 
         /// <summary>
         /// Return list of year, month and day after changing the calendar.
@@ -139,7 +208,6 @@ namespace KillDuties.Utility
         {
             List<int> result = new List<int>();
             Calendar calendar = new GregorianCalendar();
-
             switch (format)
             {
                 case CalendarFormat.ChineseLunisolar:
