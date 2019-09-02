@@ -77,4 +77,4 @@ namespace KillDuties.Utility
 ```
 
 ## License
-[MIT](https://github.com/KillDuties/KillDuties.Utility.StringExtensions/blob/master/LICENSE)
+[MIT](https://github.com/KillDuties/KillDuties.Utility.DateTimeExtensions/blob/master/LICENSE)
